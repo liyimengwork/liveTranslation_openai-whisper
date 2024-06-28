@@ -17,6 +17,7 @@ import requests
 import sounddevice as sd
 import speech_recognition as sr
 import wavio
+from groq import Groq
 import yaml
 from colorama import Fore, Style, init
 from openai import OpenAI
@@ -169,6 +170,8 @@ def load_config():
 
 
 config = load_config()
+groq_api_key = config["groq"]["api_key"]
+clientq = Groq(api_key=groq_api_key)
 openai_api_key = config["openai"]["api_key"]
 client = OpenAI(api_key=openai_api_key)  # Initialize OpenAI client globally
 
@@ -481,10 +484,13 @@ def transcribe_audio(audio_file_path):
     """
     try:
         with open(audio_file_path, "rb") as audio_file:
-            response = client.audio.transcriptions.create(
-                model="whisper-1",
-                file=audio_file,
+            response = clientq.audio.transcriptions.create(
+                file=(os.path.basename(audio_file_path), audio_file),
+                model="whisper-large-v3",
                 prompt="Please focus solely on transcribing the content of this audio. Do not translate. Maintain the original language and context as accurately as possible.",
+                response_format="json",
+                language="en",  # You can make this dynamic based on user input
+                temperature=0.0
             )
 
             logger.info(f"Full API Response: {response}\n")
@@ -561,7 +567,7 @@ def translate_text(text, custom_content=None):
                 "Authorization": f"Bearer {openai_api_key}",
             },
             json={
-                "model": "gpt-4-1106-preview",
+                "model": "gpt-4o",
                 "messages": [
                     {
                         "role": "system",
@@ -620,7 +626,7 @@ def voice_to_text():
 
     # Transcribe the saved audio file
     with open(WAVE_OUTPUT_FILENAME, "rb") as f:
-        transcript = client.audio.transcriptions.create(model="whisper-1", file=f)
+        transcript = clientq.audio.transcriptions.create(model="whisper-large-v3", file=f)
         return transcript.text
 
 
