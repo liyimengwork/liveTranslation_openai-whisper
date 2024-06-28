@@ -22,6 +22,12 @@ import yaml
 from colorama import Fore, Style, init
 from openai import OpenAI
 from pynput import keyboard
+from encoding_utils import setup_encoding
+setup_encoding()
+
+if sys.version_info[0] < 3:
+    reload(sys)
+    sys.setdefaultencoding("utf-8")
 
 # Initialize colorama and logging
 init(autoreset=True)
@@ -136,6 +142,12 @@ parser.add_argument(
     help="Choose a TTS voice for speaking the translation.",
 )
 args = parser.parse_args()
+if args.content:
+    args.content = (
+        args.content.decode(sys.getfilesystemencoding())
+        if isinstance(args.content, bytes)
+        else args.content
+    )
 
 
 # Load configuration and initialize OpenAI client
@@ -165,7 +177,7 @@ def load_config():
         - Ensure that 'config.yaml' is present in the same directory as this script or adjust the file path
           as necessary.
     """
-    with open("config.yaml", "r") as file:
+    with open("config.yaml", "r", encoding="utf-8") as file:
         return yaml.safe_load(file)
 
 
@@ -174,6 +186,12 @@ groq_api_key = config["groq"]["api_key"]
 clientq = Groq(api_key=groq_api_key)
 openai_api_key = config["openai"]["api_key"]
 client = OpenAI(api_key=openai_api_key)  # Initialize OpenAI client globally
+
+def terminal_supports_unicode():
+    import curses
+
+    curses.setupterm()
+    return curses.tigetnum("colors") > 2
 
 import subprocess
 
@@ -215,6 +233,7 @@ def create_session_folder():
     os.makedirs(session_folder, exist_ok=True)
     return session_folder
 
+from encoding_utils import safe_encode
 
 def save_transcription(folder, original, translated):
     """
@@ -245,8 +264,8 @@ def save_transcription(folder, original, translated):
           and the translated text labeled as 'Translated', followed by two newline characters for readability.
     """
 
-    with open(os.path.join(folder, "transcriptions.txt"), "a") as file:
-        file.write(f"Original: {original}\nTranslated: {translated}\n\n")
+    with open(os.path.join(folder, "transcriptions.txt"), "a", encoding="utf-8") as file:
+        file.write(f"Original: {safe_encode(original)}\nTranslated: {safe_encode(translated)}\n\n")
 
 
 def play_audio(audio_content=None, file_path=None):
@@ -346,6 +365,7 @@ def voice_stream(
         return None
     return ai_audio_path  # Return the path to the saved AI audio file
 
+from encoding_utils import safe_print
 
 def print_json_formatted(data, indent=4, width_percentage=0.65):
     """
@@ -385,7 +405,7 @@ def print_json_formatted(data, indent=4, width_percentage=0.65):
     # Iterate over the key-value pairs in the data dictionary
     for key, value in data.items():
         # Create a string representation of the key, without the value
-        key_str = json.dumps({key: ""}, indent=indent).rstrip(": {}\n")
+        key_str = json.dumps({key: ""}, indent=indent, ensure_ascii=False).rstrip(": {}\n")
 
         # Create a string representation of the value
         value_str = json.dumps(value, ensure_ascii=False)
@@ -404,10 +424,10 @@ def print_json_formatted(data, indent=4, width_percentage=0.65):
             color = Fore.CYAN
 
         # Print the key in yellow, followed by a colon
-        print(wrapper.fill(Fore.YELLOW + key_str + Style.RESET_ALL + ":"), end="")
+        safe_print(wrapper.fill(Fore.YELLOW + key_str + Style.RESET_ALL + ":"))
 
         # Print the value in the specified color
-        print(color + value_str + Style.RESET_ALL)
+        safe_print(color + value_str + Style.RESET_ALL)
 
 
 def record_audio(duration, session_folder):

@@ -1,22 +1,23 @@
-# Real-Time Translation Tool with API-Powered Models
+# Real-Time Translation Tool with Groq
 
 ## Description
-This release (v1.8) of our Real-Time Translation Tool brings significant enhancements, leveraging OpenAI's API for improved transcription, translation, and text-to-speech capabilities. It's a powerful tool for global communication and language learning, with an upcoming AI language teacher assistant feature.
+This release (v2.0 "Thunder") of our Real-Time Translation Tool introduces lightning-fast transcription capabilities powered by Groq's API, while maintaining OpenAI's robust translation and text-to-speech features. This major update significantly enhances performance and expands the tool's capabilities for global communication and language learning.
 
-## Release Notes for v1.8 🚀
+## Release Notes for v2.0 "Thunder" ⚡🚀
 ### New Features 🌟
-- **Enhanced Audio Recording**: Integrated changes to **record and save user's voice** in session folders.
-- **AI Voice Saving**: AI-generated voice responses are now **saved in session folders**, providing a comprehensive record of interactions.
-- **Streamlined User Experience**: Reduced unnecessary prompts and refined the user flow for a **smoother experience**.
-- **Session Data Management**: Added options to **save or delete session files**, giving users more control over their data.
+- **Groq API Integration**: Leveraging Groq's high-speed API for **ultra-fast transcription**, dramatically reducing processing time.
+- **Dynamic Content Handling**: Implemented a new system for **customizing content based on selected languages**, enhancing translation accuracy and context.
+- **Expanded Language Support**: Added support for multiple Spanish dialects and other languages, providing more **nuanced and region-specific translations**.
+- **Smart Select Option**: Introduced a "Smart Select" feature for **automatic language detection and multilingual translation**.
 
 ### Improvements 💡
-- **Voice Stream Functionality**: Refined the voice stream function to accept a session folder, ensuring **AI voice responses are properly saved**.
-- **Session Folder Management**: Improved session folder creation and management, enabling better **organization of session data**.
-- **Error Handling**: Enhanced error handling for robustness, especially in file operations and external API interactions.
+- **Refactored Main Function**: Streamlined the main function for better handling of command-line arguments and improved flow control.
+- **Enhanced Error Handling**: Implemented more robust error handling, especially for API interactions and file operations.
+- **Optimized Performance**: Fine-tuned the application for faster response times and improved resource utilization.
+- **User Experience Enhancements**: Refined user prompts and interaction flows for a more intuitive experience.
 
 ### Installation & Setup
-Ensure you have Python 3.x and necessary libraries installed, along with ffmpeg for audio process.
+Ensure you have Python 3.x and necessary libraries installed, along with ffmpeg for audio processing.
 
 - It also requires the command-line tool ffmpeg to be installed on your system, which is available from most package managers:
 ```
@@ -42,12 +43,14 @@ scoop install ffmpeg
 3. Install required libraries: `pip install -r requirements.txt`
 
 ## Configuration
-Set up your OpenAI API key in `config.yaml`:
+Set up your API keys in `config.yaml`:
 1. Rename `config.yaml.default` to `config.yaml`
-2. Enter your OpenAI API key in the `config.yaml` file:
+2. Enter your API keys in the `config.yaml` file:
 ```yaml
 openai:
   api_key: "Your-OpenAI-API-Key"
+groq:
+  api_key: "Your-Groq-API-Key"
 ```
 
 ## Args
@@ -58,18 +61,17 @@ Execute with `python main.py` and the following optional flags:
 - `-t`: Enable continuous translation mode. (No Spacebar toggle record)
 - `-v <voice_name>`: Activate text-to-speech for the translated text.
 
-
 ### Usage Examples
 
-- 4-second live translation in Spanish with toggle recording
+- 4-second live translation in European Spanish with toggle recording
   
-`python main.py -d 4 -c Spanish`
+`python main.py -d 4 -c "European Spanish (Spain)"`
 
 ---
 
-- 10-second live translation in continuous mode
+- 10-second live translation in continuous mode with Smart Select
 
-`python main.py -d 10 -t`
+`python main.py -d 10 -t -c "Smart Select"`
 
 ---
 
@@ -79,16 +81,14 @@ Execute with `python main.py` and the following optional flags:
 
 ---
 
-
-- Smart Select with Nova voice, 8-second recording in continuous mode
+- Mandarin Chinese translation with Nova voice, 8-second recording in continuous mode
   
-`python main.py -c 'Smart Select' -v nova -d 8 -t`
+`python main.py -c "Mandarin Chinese" -v nova -d 8 -t`
 
 ---
 
-
 ## Troubleshooting
-If you encounter issues, check your microphone settings and ensure the OpenAI API key is valid.
+If you encounter issues, check your microphone settings and ensure both the OpenAI and Groq API keys are valid and properly configured.
 
 ## Contributing
 Contributions are welcome. Fork the repository and submit a pull request with your changes.
@@ -100,7 +100,7 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 For more information, contact me at [willTheNightFox@gmail.com](mailto:willTheNightFox@gmail.com).
 
 ## Acknowledgments
-Special thanks to the OpenAI team for the Whisper and GPT-4 models.
+Special thanks to the OpenAI team for the GPT-4 model and text-to-speech capabilities, and to Groq for their lightning-fast transcription API.
 
 ## Feedback and Feature Requests
 Your feedback is invaluable to us. If you have any suggestions or would like to request new features, please feel free to open an issue on GitHub or submit a pull request. We're always looking to improve and your contributions are greatly appreciated!
