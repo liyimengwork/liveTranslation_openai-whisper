@@ -1,9 +1,0 @@
-Original:  Hello, how are you? Welcome, guys.
-Translated: Hola, ¿cómo estás? Bienvenidos, chicos.
-
-Original:  Hello guys, welcome. I was very handsome.
-Translated: Hola chicos, bienvenidos. Estaba muy guapo.
-
-Original:  Hey, how's it going? I want to go to the store. I want to find how many people I can find. I want to be in the love of life.
-Translated: Hola, ¿qué tal? Quiero ir a la tienda. Quiero ver cuántas personas puedo encontrar. Quiero estar en el amor de la vida.
-
