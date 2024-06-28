@@ -11,3 +11,5 @@ readchar
 speechrecognition
 openai
 pynput
+groq
+pathlib

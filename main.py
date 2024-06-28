@@ -177,6 +177,15 @@ client = OpenAI(api_key=openai_api_key)  # Initialize OpenAI client globally
 
 import subprocess
 
+def get_modified_content(language):
+    if language not in language_map:
+        raise ValueError(f"Unsupported language: {language}")
+    
+    lang_info = language_map[language]
+    modified_content = DEFAULT_CONTENT.replace("[Desired Language]", language)
+    modified_content = modified_content.replace("[Name of desired language in that language]", lang_info[0])
+    modified_content = modified_content.replace("[Phrase in desired language in that language's text if possible]", lang_info[1])
+    return modified_content
 
 def create_session_folder():
     """
@@ -490,7 +499,7 @@ def transcribe_audio(audio_file_path):
                 prompt="Please focus solely on transcribing the content of this audio. Do not translate. Maintain the original language and context as accurately as possible.",
                 response_format="json",
                 language="en",  # You can make this dynamic based on user input
-                temperature=0.0
+                temperature=0.4
             )
 
             logger.info(f"Full API Response: {response}\n")
@@ -506,7 +515,7 @@ def transcribe_audio(audio_file_path):
         return None
 
 
-def translate_text(text, custom_content=None):
+def translate_text(text, content):
     """
     Leverages the OpenAI GPT-4 language model to translate provided text into a specified language.
     The translation can be customized via a system prompt, which can be specified by the user through
@@ -540,24 +549,6 @@ def translate_text(text, custom_content=None):
         # Expected output: "Bonjour le monde!"
     """
     try:
-        # Determine the content based on the custom_content and text arguments
-        if custom_content is not None:
-            if text:
-                # When -c is used and there is text following, use the user's text
-                content = custom_content
-            else:
-                # When -c is used and no text is following, use the special content
-                content = custom_content
-        else:
-            # If -c is not used, use the default content
-            content = DEFAULT_CONTENT
-
-        # source_language = "English" if text.isascii() else "[Desired Language]"
-        # target_language = "[Desired Language]" if source_language == "English" else "English"
-
-        # print(f"Source Language: {source_language}")
-        # print(f"Target Language: {target_language}")
-        # Log the content that will be used in the API call
         logger.info(f"Content used for translation: {content}")
 
         response = requests.post(
@@ -567,12 +558,9 @@ def translate_text(text, custom_content=None):
                 "Authorization": f"Bearer {openai_api_key}",
             },
             json={
-                "model": "gpt-4o",
+                "model": "gpt-4",
                 "messages": [
-                    {
-                        "role": "system",
-                        "content": content,
-                    },
+                    {"role": "system", "content": content},
                     {"role": "user", "content": f"{text}"},
                 ],
             },
@@ -582,11 +570,10 @@ def translate_text(text, custom_content=None):
             response_data = json.loads(response.text)
             translated_text = response_data["choices"][0]["message"]["content"].strip()
 
-            # Log and print the successful translation
             log_message = f"Translated text: {translated_text}"
             logging.info(log_message)
 
-            return translated_text  # If you want to print to the console as well
+            return translated_text
         else:
             logger.error(Fore.RED + f"Failed to translate text: {response.text}\n")
             return None
@@ -910,9 +897,21 @@ def main():
     Example Usage:
     main()
     """
-    print(
-        Fore.GREEN + "\nWelcome to the real-time translation tool.\n" + Style.RESET_ALL
-    )
+    print(Fore.GREEN + "\nWelcome to the real-time translation tool.\n" + Style.RESET_ALL)
+
+    # Determine the content based on the -c argument
+    if args.content is None or args.content == '':
+        # Prompt user to select a language
+        print("Please select a language:")
+        for i, lang in enumerate(language_map.keys(), 1):
+            print(f"{i}. {lang}")
+        choice = int(input("Enter the number of your choice: ")) - 1
+        selected_language = list(language_map.keys())[choice]
+        content = get_modified_content(selected_language)
+    elif args.content == 'Smart Select':
+        content = SPECIAL_CONTENT
+    else:
+        content = get_modified_content(args.content)
 
     # Handling `-f` argument with interactive choices
     if args.file:
@@ -923,11 +922,7 @@ def main():
             print("Invalid choice. Exiting.")
             sys.exit(1)
 
-        file_choice = (
-            input("Process all audio files in the same directory? (yes/no): ")
-            .strip()
-            .lower()
-        )
+        file_choice = input("Process all audio files in the same directory? (yes/no): ").strip().lower()
         files_to_process = []
         if file_choice == "yes":
             directory_path = input("Enter the directory path: ").strip()
@@ -945,22 +940,20 @@ def main():
             if action_choice == "1":  # Transcribe and translate
                 transcribed_text = transcribe_audio(file_path)
                 if transcribed_text:
-                    translated_text = translate_text(transcribed_text, DEFAULT_CONTENT)
-                    content = (
-                        f"Original: {transcribed_text}\nTranslation: {translated_text}"
-                    )
-                    save_to_desktop(text_file_name, content)
+                    translated_text = translate_text(transcribed_text, content)
+                    result_content = f"Original: {transcribed_text}\nTranslation: {translated_text}"
+                    save_to_desktop(text_file_name, result_content)
             elif action_choice == "2":  # Only transcribe
                 transcribed_text = transcribe_audio(file_path)
                 if transcribed_text:
-                    content = f"Transcription: {transcribed_text}"
-                    save_to_desktop(text_file_name, content)
+                    result_content = f"Transcription: {transcribed_text}"
+                    save_to_desktop(text_file_name, result_content)
     else:
-        # Existing logic for continuous or single run mode remains unchanged...
+        # Continuous or single run mode
         if args.continuous:
-            continuous_run_mode(DEFAULT_CONTENT)
+            continuous_run_mode(content)
         else:
-            single_run_mode(DEFAULT_CONTENT)
+            single_run_mode(content)
 
 
 if __name__ == "__main__":
