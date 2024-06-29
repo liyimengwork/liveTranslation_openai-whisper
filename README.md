@@ -88,10 +88,15 @@ Execute with `python main.py` and the following optional flags:
 
 ---
 
+
+
+
+
+
 ## Web Application (gTranscribeq)
 gTranscribeq is a Streamlit-based web application that provides an easy-to-use interface for audio transcription using Groq's API.
-![alt text](image.png)
 
+![alt text](image.png)
 ### Features
 - Drag-and-drop or file upload functionality for audio files
 - Support for WAV, MP3, and M4A audio formats
