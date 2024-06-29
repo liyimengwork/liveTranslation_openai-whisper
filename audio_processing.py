@@ -23,7 +23,16 @@ is_recording = False
 
 
 def record_audio(duration, session_folder):
-    """Record audio for a specified duration."""
+    """
+    Record audio for a specified duration.
+
+    Args:
+        duration (float): The duration of the recording in seconds.
+        session_folder (str): The folder path where the recorded audio will be saved.
+
+    Returns:
+        numpy.ndarray or None: The recorded audio data as a flattened numpy array, or None if an error occurred during recording.
+    """
     try:
         audio_data = sd.rec(int(duration * RATE), samplerate=RATE, channels=CHANNELS, dtype=np.int16)
         sd.wait()
@@ -33,7 +42,16 @@ def record_audio(duration, session_folder):
         return None
 
 def play_audio(audio_content=None, file_path=None):
-    """Play audio using ffplay."""
+    """
+    Play audio using ffplay.
+
+    Args:
+        audio_content (bytes, optional): The audio content to play. Defaults to None.
+        file_path (str, optional): The path to the audio file to play. Defaults to None.
+
+    Raises:
+        Exception: If an error occurs during audio playback.
+    """
     try:
         cmd = ["ffplay", "-nodisp", "-autoexit"]
         stdin_pipe = None
