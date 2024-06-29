@@ -1,10 +1,11 @@
 # Real-Time Translation Tool with Groq
 
 ## Description
-This release (v2.0 "Thunder") of our Real-Time Translation Tool introduces lightning-fast transcription capabilities powered by Groq's API, while maintaining OpenAI's robust translation and text-to-speech features. This major update significantly enhances performance and expands the tool's capabilities for global communication and language learning.
+This release (v2.1 "Thunder+") of our Real-Time Translation Tool introduces lightning-fast transcription capabilities powered by Groq's API, while maintaining OpenAI's robust translation and text-to-speech features. This update significantly enhances performance and expands the tool's capabilities for global communication and language learning.
 
-## Release Notes for v2.0 "Thunder" ⚡🚀
+## Release Notes for v2.1 "Thunder+" ⚡🚀
 ### New Features 🌟
+- **gTranscribeq Web App**: Introduced a Streamlit-based web application for easy audio transcription using Groq's API.
 - **Groq API Integration**: Leveraging Groq's high-speed API for **ultra-fast transcription**, dramatically reducing processing time.
 - **Dynamic Content Handling**: Implemented a new system for **customizing content based on selected languages**, enhancing translation accuracy and context.
 - **Expanded Language Support**: Added support for multiple Spanish dialects and other languages, providing more **nuanced and region-specific translations**.
@@ -53,7 +54,7 @@ groq:
   api_key: "Your-Groq-API-Key"
 ```
 
-## Args
+## Command-Line Interface (main.py)
 Execute with `python main.py` and the following optional flags:
 - `-d <seconds>`: Set the duration for audio capture.
 - `-f <filename.wav>`: Translate from an existing audio file.
@@ -87,8 +88,26 @@ Execute with `python main.py` and the following optional flags:
 
 ---
 
+## Web Application (gTranscribeq)
+gTranscribeq is a Streamlit-based web application that provides an easy-to-use interface for audio transcription using Groq's API.
+
+### Features
+- Drag-and-drop or file upload functionality for audio files
+- Support for WAV, MP3, and M4A audio formats
+- Automatic transcription using Groq's high-speed API
+- Display of transcription results with download option
+
+### Running gTranscribeq
+To run the gTranscribeq web application:
+
+1. Ensure you have installed all requirements: `pip install -r requirements.txt`
+2. Run the Streamlit app: `streamlit run gTranscribeq.py`
+3. Open your web browser and navigate to the URL provided by Streamlit (usually `http://localhost:8501`)
+
+Use the web interface to upload your audio file and receive the transcription quickly and easily.
+
 ## Troubleshooting
-If you encounter issues, check your microphone settings and ensure both the OpenAI and Groq API keys are valid and properly configured.
+If you encounter issues, check your microphone settings and ensure both the OpenAI and Groq API keys are valid and properly configured in the `config.yaml` file.
 
 ## Contributing
 Contributions are welcome. Fork the repository and submit a pull request with your changes.
