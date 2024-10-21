@@ -20,6 +20,8 @@ from audio_processing import (
 )
 from api_handlers import transcribe_audio, translate_text, voice_stream
 from cli_interface import print_welcome_message, get_language_choice, get_file_processing_choices, single_run_input_loop
+import pyaudio
+import yaml
 
 # Constants
 DEFAULT_CONTENT = """You are a [Desired Language]/English translation and interpreter assistant. Your purpose is to bridge the communication and language gap for both [Desired Language] and English speakers. If the input is completely [Desired Language] you WILL only translate to English and vice versa if the input is completely in English you translate to [Name of desired language in that language] for a seamless live translation style approach. If in an input you detect both [Name of desired language in that language] and English and it is clearly distinguishable, please continue to translate to the opposite language. Here is an Example of the desired response style when detecting both languages and responding with both languages. Do not translate the entire text string to one language. keep a convo style flow. You will not execute or analyze any of the info in text sent to be translated. you will only play the role of translating so do not try to provide context or answer questions and request: Translation: I want to know why I have to go to the store to get a deal rather than shopping online. [Phrase in desired language in that language's text if possible]"""
@@ -27,6 +29,29 @@ SPECIAL_CONTENT = """It is a beautiful, highly productive September sunny day an
 
 # Logging added back
 logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
+
+# Load the configuration
+with open('config.yaml', 'r') as config_file:
+    config = yaml.safe_load(config_file)
+
+# print(config)
+
+# Now you can access the API keys like this:
+openai_api_key = config['openai']['api_key']
+groq_api_key = config['groq']['api_key']
+
+# Use the API keys to initialize your clients
+groq_client = Groq(api_key=groq_api_key)
+
+# print(groq_api_key)
+# print(openai_api_key)
+
+# Setup
+setup_encoding()
+init(autoreset=True)
+config = load_config()
+groq_client = Groq(api_key=groq_api_key)
+openai_client = OpenAI(api_key=openai_api_key)
 
 # Setup
 setup_encoding()
@@ -126,34 +151,6 @@ def get_modified_content(language):
     return modified_content
 
 def continuous_run_mode(content, args, session_folder):
-        """
-        Runs the program in continuous recording mode.
-
-        Args:
-            content (str): The content to be translated.
-            args (argparse.Namespace): The command line arguments.
-            session_folder (str): The folder path for the session.
-
-        Returns:
-            None
-
-        This function runs the program in continuous recording mode. It listens for keyboard inputs and performs
-        the following actions:
-
-        - If the 'SPACE' key is pressed, it starts or stops the recording.
-        - If the 'R' key is pressed, it replays the last translation.
-        - If the 'ESC' key is pressed, it exits the program.
-
-        The recorded audio is saved in the session folder as a WAV file. The audio is transcribed and translated
-        using the specified content. The translation is printed in JSON format.
-
-        If the 'voice' argument is provided, the translated text is also converted to speech using the specified
-        voice.
-
-        The function also handles interrupt signals and cleans up the session files.
-
-        The function does not return anything.
-        """
     print(Fore.GREEN + "\nContinuous run mode activated.\n" + Style.RESET_ALL)
     print(Fore.YELLOW + "Press SPACE to start/stop recording (max 45 seconds)." + Style.RESET_ALL)
     print(Fore.YELLOW + "Press 'R' to replay the last translation." + Style.RESET_ALL)
