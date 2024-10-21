@@ -13,3 +13,5 @@ openai
 pynput
 groq
 pathlib
+streamlit
+pyaudio
